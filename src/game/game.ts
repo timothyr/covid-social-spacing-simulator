@@ -3,6 +3,28 @@ import * as PIXI from 'pixi.js';
 
 export function setup(app: PIXI.Application, viewport: Viewport) {
 
+    let timeScore = null;
+    let timeScoreNum = 1;
+
+    var timestyle = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 32,
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        fill: ['#00ffff', '#00ff00'], // gradient
+        stroke: '#4a1850',
+        strokeThickness: 10,
+        dropShadow: true,
+        dropShadowColor: '#000000',
+        dropShadowBlur: 4,
+        dropShadowAngle: Math.PI / 2,
+        dropShadowDistance: 6,
+        wordWrap: true,
+        wordWrapWidth: 700
+    });
+
+
+
     var landscapeTexture = PIXI.Texture.from('assets/bg.png');
     
     const background = new PIXI.Sprite(landscapeTexture);
@@ -48,7 +70,7 @@ export function setup(app: PIXI.Application, viewport: Viewport) {
         else {
             gameOverLoops += 1;
             if (gameOverLoops <= maxGameOverLoops) {
-                gameOver(app);
+                gameOver(app, timeScoreNum);
 
             }
 
@@ -58,6 +80,18 @@ export function setup(app: PIXI.Application, viewport: Viewport) {
     setInterval(() => {
         if (gameRunning) {
             addEnemy(enemies, app, varus_container)
+            if (timeScore) {
+                // delete
+                app.stage.removeChild(timeScore);
+
+            }
+
+        
+            timeScore = new PIXI.Text(`Seconds survived: ${timeScoreNum}`, timestyle);
+            timeScore.x = 50;
+            timeScore.y = 100;
+            app.stage.addChild(timeScore);
+            timeScoreNum += 1;
         }
     }, 1000);
 
@@ -207,7 +241,7 @@ function collisiontest(enemy, player) {
         && bounds1.y + bounds1.height > bounds2.y;
 }
 
-function gameOver(app) {
+function gameOver(app, timeScoreNum) {
     const end = new PIXI.Graphics();
 
     end.beginFill(0x000000, 0.03);
@@ -300,9 +334,14 @@ function gameOver(app) {
 
     app.stage.addChild(nicetxt);
 
+    var timetext = new PIXI.Text(`This Mink survived ${timeScoreNum} seconds.`, style);
+    timetext.x = 50;
+    timetext.y = 500;
+    app.stage.addChild(timetext);
+
     var retrytext = new PIXI.Text('Refresh your browser to save the next one.', retrystyle);
     retrytext.x = 50;
-    retrytext.y = 500;
+    retrytext.y = 600;
     app.stage.addChild(retrytext);
 
 
