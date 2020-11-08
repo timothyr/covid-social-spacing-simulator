@@ -3,6 +3,12 @@ import * as PIXI from 'pixi.js';
 
 export function setup(app: PIXI.Application, viewport: Viewport) {
 
+    const varus_container = new PIXI.Container();
+	app.stage.addChild(varus_container);
+    
+
+    const enemies = [];
+
 	const playerCurrentPos = {
         rotation: 0,
 		x: app.screen.width / 2,
@@ -16,19 +22,49 @@ export function setup(app: PIXI.Application, viewport: Viewport) {
     }
 
     const player = createPlayer(app);
-    const virus = createEnemy(app);
+
+    
     // Game loop
     app.ticker.add((delta) => {
         updatePlayerPos(player, playerCurrentPos, playerTargetPos, delta);
+
+        enemies.forEach((enemy, i) => {
+            // console.log("updte", i);
+            updateEnemyPos(enemy, playerCurrentPos, delta, i);
+            if (collisiontest(enemy, player.bunny)) {
+                gameOver(app);
+            }
+        });
     });
 
-    app.renderer.plugins.interaction.on('mouseup', (event) => onClick(event, playerCurrentPos, app, playerTargetPos));
+    setInterval(() => addEnemy(enemies, app, varus_container), 1000);
+
+    app.renderer.plugins.interaction.on('mouseup', (event) => onClick(event, playerCurrentPos, player, playerTargetPos, app));
+}
+
+function addEnemy(enemies, app, varus_container) {
+    const newEnemy = createEnemy(app, varus_container);
+    enemies.push(newEnemy);
+    console.log("we spawn", enemies.length)
+}
+
+function updateEnemyPos(enemy, playerCurrentPos, delta, i) {
+    const angle = Math.atan2(playerCurrentPos.y - enemy.y, playerCurrentPos.x - enemy.x);
+    const perFrameDistance = 1;
+
+    const sin = Math.sin(angle) * perFrameDistance * delta;
+    const cos = Math.cos(angle) * perFrameDistance * delta;
+
+    // enemy.x = (Math.random() * 100) + (i * 100);
+
+    enemy.x += cos;
+    enemy.y += sin;
 }
 
 function updatePlayerPos(player, playerCurrentPos, playerTargetPos, delta) {
     if (playerCurrentPos.x != playerTargetPos.x || playerCurrentPos.y != playerTargetPos.y) {
         const angle = Math.atan2(playerTargetPos.y - playerCurrentPos.y, playerTargetPos.x - playerCurrentPos.x);
-        const perFrameDistance = 10;
+        const perFrameDistance = 5;
 
         const sin = Math.sin(angle) * perFrameDistance * delta;
         const cos = Math.cos(angle) * perFrameDistance * delta;
@@ -42,14 +78,13 @@ function updatePlayerPos(player, playerCurrentPos, playerTargetPos, delta) {
             playerCurrentPos.y += sin;
             playerCurrentPos.y = Math.round(playerCurrentPos.y);
         }
-        player.position.x = playerCurrentPos.x;
+        player.container.position.x = playerCurrentPos.x;
         // console.log(playerCurrentPos.y, playerTargetPos.y)
-        player.position.y = playerCurrentPos.y;
+        player.container.position.y = playerCurrentPos.y;
     }
 
     playerCurrentPos.rotation = lerp(playerCurrentPos.rotation, playerTargetPos.rotation, 0.1);
-    console.log("lerp", playerCurrentPos.rotation);
-    player.rotation = playerCurrentPos.rotation;
+    player.bunny.rotation = playerCurrentPos.rotation;
 }
 
 function createPlayer(app) {
@@ -69,7 +104,9 @@ function createPlayer(app) {
     bunny.y = container.height / 2;
 
     bunny.width = bunny.width * 50;
-        bunny.height = bunny.height * 130;
+    bunny.height = bunny.height * 130;
+
+    
 
     container.addChild(bunny);
     
@@ -81,51 +118,53 @@ function createPlayer(app) {
     container.pivot.x = container.width / 2;
     container.pivot.y = container.height / 2;
     
-    return container;
+    return { container, bunny };
 }
 
-function createEnemy(app) {
-	const varus_container = new PIXI.Container();
+function createEnemy(app, varus_container) {
 
-	app.stage.addChild(varus_container);
 
-	    // Create a new texture
-    const textur = PIXI.Texture.from('/assets/corona.png');
+    // Create a new texture
+    const textur = PIXI.Texture.from('/assets/Covid.png');
     
     // Create mink
-    const enemy = new PIXI.Sprite(textur);
-    enemy.anchor.set(0.5);
+    const enemyx = new PIXI.Sprite(textur);
+    enemyx.anchor.set(0.5);
 
-    enemy.width = enemy.width * 30;
-    enemy.height = enemy.height * 30 ;
+    enemyx.width = 60;
+    enemyx.height = 40; ;
+
+    enemyx.x = (Math.random() * 2000) - 1000;
+    enemyx.y = (Math.random() * 2000) - 1000;
 
     //width
     // enemy.x = varus_container.width / 2;
     // //height
     // enemy.y = varus_container.height / 2;
 
-    varus_container.addChild(enemy);
+    const good = varus_container.addChild(enemyx);
     
-    // Move container to the center
-    varus_container.x = app.screen.width / 2;
-    varus_container.y = app.screen.height / 2;
+    // // Move container to the center
+    // varus_container.x = app.screen.width / 2 + (Math.random() * 50);
+    // varus_container.y = app.screen.height / 2 + (Math.random() * 50);
     
-    // Center bunny sprite in local container coordinates
-    varus_container.pivot.x = varus_container.width / 2;
-    varus_container.pivot.y = varus_container.height / 2;
+    // // Center bunny sprite in local container coordinates
+    // varus_container.pivot.x = varus_container.width / 2;
+    // varus_container.pivot.y = varus_container.height / 2;
     
-    return varus_container;
+    return good;
 }
 
-function onClick (event, player, app, target) {
-	target.x = Math.round(event.data.global.x);
-    target.y = Math.round(event.data.global.y);
+function onClick (event, playerCurrentPos, player, playerTargetPos, app) {
+    console.log(app.screen);
+	playerTargetPos.x = Math.round(event.data.global.x) - (app.screen.width / 8);
+    playerTargetPos.y = Math.round(event.data.global.y) - (app.screen.height / 8);
     // Get target angle
-    const dy = target.y - player.y;
-    const dx = target.x - player.x;
+    const dy = playerTargetPos.y - playerCurrentPos.y;
+    const dx = playerTargetPos.x - playerCurrentPos.x;
     const theta = Math.atan2(dy, dx);
-    target.rotation = theta + 2;//(theta * 180 / Math.PI) % 360;
-    console.log(player.rotation);
+    playerTargetPos.rotation = theta + 2;//(theta * 180 / Math.PI) % 360;
+    console.log(playerCurrentPos.rotation);
 }
 
 function lerp (value1, value2, amount) {
@@ -133,4 +172,24 @@ function lerp (value1, value2, amount) {
     amount = amount > 1 ? 1 : amount;
     // const offset = a
     return value1 + (value2 - value1) * amount;
+}
+
+function collisiontest(enemy, player) {
+    const bounds1 = enemy.getBounds();
+    const bounds2 = player.getBounds();
+
+    return bounds1.x < bounds2.x// + bounds2.width
+        && bounds1.x + bounds1.width > bounds2.x
+        && bounds1.y < bounds2.y// + bounds2.height
+        && bounds1.y + bounds1.height > bounds2.y;
+}
+
+function gameOver(app) {
+	const end = new PIXI.Graphics();
+
+	end.beginFill(0x3a4e3a);
+	end.drawRect(0, 0, 1200, 800);
+	end.endFill();
+	app.stage.addChild(end);
+	return end;
 }
