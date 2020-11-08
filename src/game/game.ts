@@ -3,6 +3,17 @@ import * as PIXI from 'pixi.js';
 
 export function setup(app: PIXI.Application, viewport: Viewport) {
 
+	const pos = {
+		x: app.screen.width / 2,
+		y: app.screen.height / 2
+	}
+
+	const target = {
+		x: app.screen.width / 2,
+		y: app.screen.height / 2
+	}
+
+
     const container = new PIXI.Container();
     
     app.stage.addChild(container);
@@ -11,11 +22,13 @@ export function setup(app: PIXI.Application, viewport: Viewport) {
     const texture = PIXI.Texture.from('/assets/mink.jpg');
     
     // Create a 5x5 grid of bunnies
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 1; i++) {
         const bunny = new PIXI.Sprite(texture);
-        bunny.anchor.set(0.5);
-        bunny.x = (i % 5) * 40;
-        bunny.y = Math.floor(i / 5) * 40;
+        bunny.anchor.set(1);
+        //width
+        bunny.x = container.width / 2;
+        //height
+        bunny.y = container.height / 2;
         container.addChild(bunny);
     }
     
@@ -29,9 +42,35 @@ export function setup(app: PIXI.Application, viewport: Viewport) {
     
     // Listen for animate update
     app.ticker.add((delta) => {
+    	pos.x = lerp(pos.x, target.x, delta * 0.01)
+    	pos.y = lerp(pos.y, target.y, delta * 0.01)
+
+		container.position.x = pos.x;
+		console.log(delta)
+		container.position.y = pos.y;
         // rotate the container!
         // use delta to create frame-independent transform
-        container.rotation -= 0.01 * delta;
+        // container.rotation -= 0.01 * delta;
     });
-    
+
+// const redSquare = new PIXI.Sprite(PIXI.Texture.from('/assets/mink.png'));
+// 	redSquare.position.set(0, 0);
+// 	redSquare.width = redSquare.width / 2;
+// 	redSquare.height = redSquare.height / 2;
+
+app.renderer.plugins.interaction.on('mouseup', (event) => onClick(event, container, app, target));
+
+
+}
+
+function lerp (value1, value2, amount) {
+    amount = amount < 0 ? 0 : amount;
+    amount = amount > 1 ? 1 : amount;
+    // const offset = a
+    return value1 + (value2 - value1) * amount;
+}
+
+function onClick (event, container, app, target) {
+	target.x = event.data.global.x;
+    target.y = event.data.global.y;
 }

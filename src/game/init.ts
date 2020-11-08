@@ -2,13 +2,13 @@ import * as PIXI from 'pixi.js';
 import { Viewport } from 'pixi-viewport'
 import * as game from './game';
 
-const WIDTH = 800;
+const WIDTH = 1200;
 const HEIGHT = 800;
 
 export function initGame(gameElement: HTMLElement) {
 
 
-    const app = new PIXI.Application()
+    const app = new PIXI.Application({ backgroundColor: 0x2d21f3 })
     // document.body.appendChild(app.view)
 
     document.getElementById("floorplanner").appendChild(app.view);
