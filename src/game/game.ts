@@ -23,18 +23,25 @@ export function setup(app: PIXI.Application, viewport: Viewport) {
 
     const player = createPlayer(app);
 
+    let gameRunning = true;
     
     // Game loop
     app.ticker.add((delta) => {
-        updatePlayerPos(player, playerCurrentPos, playerTargetPos, delta);
+    	if (gameRunning) {
+        	updatePlayerPos(player, playerCurrentPos, playerTargetPos, delta);
 
-        enemies.forEach((enemy, i) => {
+        	enemies.forEach((enemy, i) => {
             // console.log("updte", i);
             updateEnemyPos(enemy, playerCurrentPos, delta, i);
             if (collisiontest(enemy, player.bunny)) {
-                gameOver(app);
+            	gameRunning = false
             }
-        });
+        	});
+    	}
+    	else {
+                gameOver(app);
+
+    	}
     });
 
     setInterval(() => addEnemy(enemies, app, varus_container), 1000);
@@ -178,16 +185,16 @@ function collisiontest(enemy, player) {
     const bounds1 = enemy.getBounds();
     const bounds2 = player.getBounds();
 
-    return bounds1.x < bounds2.x// + bounds2.width
+    return bounds1.x < bounds2.x + 50 // + bounds2.width
         && bounds1.x + bounds1.width > bounds2.x
-        && bounds1.y < bounds2.y// + bounds2.height
+        && bounds1.y < bounds2.y + 50// + bounds2.height
         && bounds1.y + bounds1.height > bounds2.y;
 }
 
 function gameOver(app) {
 	const end = new PIXI.Graphics();
 
-	end.beginFill(0x3a4e3a);
+	end.beginFill(0x000000, 0.03);
 	end.drawRect(0, 0, 1200, 800);
 	end.endFill();
 	app.stage.addChild(end);
