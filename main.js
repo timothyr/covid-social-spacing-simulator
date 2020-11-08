@@ -53,6 +53,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! pixi.js */ "IqKQ");
 
 function setup(app, viewport) {
+    var landscapeTexture = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Texture"].from('assets/bg.png');
+    const background = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](landscapeTexture);
+    app.stage.addChild(background);
     const varus_container = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Container"]();
     app.stage.addChild(varus_container);
     const enemies = [];
