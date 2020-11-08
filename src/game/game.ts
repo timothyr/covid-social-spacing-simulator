@@ -3,17 +3,50 @@ import * as PIXI from 'pixi.js';
 
 export function setup(app: PIXI.Application, viewport: Viewport) {
 
-	const pos = {
+	const playerCurrentPos = {
 		x: app.screen.width / 2,
 		y: app.screen.height / 2
 	}
 
-	const target = {
+	const playerTargetPos = {
 		x: app.screen.width / 2,
 		y: app.screen.height / 2
-	}
+    }
 
+    const player = createPlayer(app);
 
+    // Game loop
+    app.ticker.add((delta) => {
+        updatePlayerPos(player, playerCurrentPos, playerTargetPos, delta);
+    });
+
+    app.renderer.plugins.interaction.on('mouseup', (event) => onClick(event, player, app, playerTargetPos));
+}
+
+function updatePlayerPos(player, playerCurrentPos, playerTargetPos, delta) {
+    if (playerCurrentPos.x != playerTargetPos.x || playerCurrentPos.y != playerTargetPos.y) {
+        const angle = Math.atan2(playerTargetPos.y - playerCurrentPos.y, playerTargetPos.x - playerCurrentPos.x);
+        const perFrameDistance = 10;
+
+        const sin = Math.sin(angle) * perFrameDistance * delta;
+        const cos = Math.cos(angle) * perFrameDistance * delta;
+
+        if (Math.abs(playerCurrentPos.x - playerTargetPos.x) > perFrameDistance) {
+            playerCurrentPos.x += cos;
+            playerCurrentPos.x = Math.round(playerCurrentPos.x);
+        }
+
+        if (Math.abs(playerCurrentPos.y - playerTargetPos.y) > perFrameDistance) {
+            playerCurrentPos.y += sin;
+            playerCurrentPos.y = Math.round(playerCurrentPos.y);
+        }
+        player.position.x = playerCurrentPos.x;
+        console.log(playerCurrentPos.y, playerTargetPos.y)
+        player.position.y = playerCurrentPos.y;
+    }
+}
+
+function createPlayer(app) {
     const container = new PIXI.Container();
     
     app.stage.addChild(container);
@@ -21,16 +54,14 @@ export function setup(app: PIXI.Application, viewport: Viewport) {
     // Create a new texture
     const texture = PIXI.Texture.from('/assets/mink.jpg');
     
-    // Create a 5x5 grid of bunnies
-    for (let i = 0; i < 1; i++) {
-        const bunny = new PIXI.Sprite(texture);
-        bunny.anchor.set(1);
-        //width
-        bunny.x = container.width / 2;
-        //height
-        bunny.y = container.height / 2;
-        container.addChild(bunny);
-    }
+    // Create mink
+    const bunny = new PIXI.Sprite(texture);
+    bunny.anchor.set(0.5);
+    //width
+    bunny.x = container.width / 2;
+    //height
+    bunny.y = container.height / 2;
+    container.addChild(bunny);
     
     // Move container to the center
     container.x = app.screen.width / 2;
@@ -40,37 +71,10 @@ export function setup(app: PIXI.Application, viewport: Viewport) {
     container.pivot.x = container.width / 2;
     container.pivot.y = container.height / 2;
     
-    // Listen for animate update
-    app.ticker.add((delta) => {
-    	pos.x = lerp(pos.x, target.x, delta * 0.01)
-    	pos.y = lerp(pos.y, target.y, delta * 0.01)
-
-		container.position.x = pos.x;
-		console.log(delta)
-		container.position.y = pos.y;
-        // rotate the container!
-        // use delta to create frame-independent transform
-        // container.rotation -= 0.01 * delta;
-    });
-
-// const redSquare = new PIXI.Sprite(PIXI.Texture.from('/assets/mink.png'));
-// 	redSquare.position.set(0, 0);
-// 	redSquare.width = redSquare.width / 2;
-// 	redSquare.height = redSquare.height / 2;
-
-app.renderer.plugins.interaction.on('mouseup', (event) => onClick(event, container, app, target));
-
-
-}
-
-function lerp (value1, value2, amount) {
-    amount = amount < 0 ? 0 : amount;
-    amount = amount > 1 ? 1 : amount;
-    // const offset = a
-    return value1 + (value2 - value1) * amount;
+    return container;
 }
 
 function onClick (event, container, app, target) {
-	target.x = event.data.global.x;
-    target.y = event.data.global.y;
+	target.x = Math.round(event.data.global.x);
+    target.y = Math.round(event.data.global.y);
 }
