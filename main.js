@@ -53,6 +53,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! pixi.js */ "IqKQ");
 
 function setup(app, viewport) {
+    let timeScore = null;
+    let timeScoreNum = 1;
+    var timestyle = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["TextStyle"]({
+        fontFamily: 'Arial',
+        fontSize: 32,
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        fill: ['#00ffff', '#00ff00'],
+        stroke: '#4a1850',
+        strokeThickness: 10,
+        dropShadow: true,
+        dropShadowColor: '#000000',
+        dropShadowBlur: 4,
+        dropShadowAngle: Math.PI / 2,
+        dropShadowDistance: 6,
+        wordWrap: true,
+        wordWrapWidth: 700
+    });
     var landscapeTexture = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Texture"].from('assets/bg.png');
     const background = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](landscapeTexture);
     app.stage.addChild(background);
@@ -88,13 +106,22 @@ function setup(app, viewport) {
         else {
             gameOverLoops += 1;
             if (gameOverLoops <= maxGameOverLoops) {
-                gameOver(app);
+                gameOver(app, timeScoreNum);
             }
         }
     });
     setInterval(() => {
         if (gameRunning) {
             addEnemy(enemies, app, varus_container);
+            if (timeScore) {
+                // delete
+                app.stage.removeChild(timeScore);
+            }
+            timeScore = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Text"](`Seconds survived: ${timeScoreNum}`, timestyle);
+            timeScore.x = 50;
+            timeScore.y = 100;
+            app.stage.addChild(timeScore);
+            timeScoreNum += 1;
         }
     }, 1000);
     app.renderer.plugins.interaction.on('mouseup', (event) => onClick(event, playerCurrentPos, player, playerTargetPos, app));
@@ -206,7 +233,7 @@ function collisiontest(enemy, player) {
         && bounds1.y < bounds2.y + 50 // + bounds2.height
         && bounds1.y + bounds1.height > bounds2.y;
 }
-function gameOver(app) {
+function gameOver(app, timeScoreNum) {
     const end = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Graphics"]();
     end.beginFill(0x000000, 0.03);
     end.drawRect(0, 0, 1200, 800);
@@ -287,9 +314,13 @@ function gameOver(app) {
     nicetxt.x = 50;
     nicetxt.y = 350;
     app.stage.addChild(nicetxt);
+    var timetext = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Text"](`This Mink survived ${timeScoreNum} seconds.`, style);
+    timetext.x = 50;
+    timetext.y = 500;
+    app.stage.addChild(timetext);
     var retrytext = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Text"]('Refresh your browser to save the next one.', retrystyle);
     retrytext.x = 50;
-    retrytext.y = 500;
+    retrytext.y = 600;
     app.stage.addChild(retrytext);
     app.stage.addChild(richText);
     return end;
