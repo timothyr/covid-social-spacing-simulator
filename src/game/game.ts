@@ -112,7 +112,7 @@ function createPlayer(app) {
     app.stage.addChild(container);
 
     // Create a new texture
-    const texture = PIXI.Texture.from('/assets/mink.png');
+    const texture = PIXI.Texture.from('assets/mink.png');
 
     // Create mink
     const bunny = new PIXI.Sprite(texture);
@@ -144,7 +144,7 @@ function createEnemy(app, varus_container) {
 
 
     // Create a new texture
-    const textur = PIXI.Texture.from('/assets/Covid.png');
+    const textur = PIXI.Texture.from('assets/Covid.png');
 
     // Create mink
     const enemyx = new PIXI.Sprite(textur);
