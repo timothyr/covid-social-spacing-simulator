@@ -53,23 +53,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! pixi.js */ "IqKQ");
 
 function setup(app, viewport) {
-    var retrystyle = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["TextStyle"]({
-        fontFamily: 'Arial',
-        fontSize: 20,
-        fontStyle: 'italic',
-        fontWeight: 'bold',
-        fill: ['#00ffff', '#00ff00'],
-        stroke: '#4a1850',
-        strokeThickness: 10,
-        dropShadow: true,
-        dropShadowColor: '#000000',
-        dropShadowBlur: 4,
-        dropShadowAngle: Math.PI / 2,
-        dropShadowDistance: 6,
-        wordWrap: true,
-        wordWrapWidth: 700
-    });
-    let timePassed = null;
     const varus_container = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Container"]();
     app.stage.addChild(varus_container);
     const enemies = [];
@@ -85,9 +68,8 @@ function setup(app, viewport) {
     };
     const player = createPlayer(app);
     let gameRunning = true;
-    const maxGameOverLoops = 70;
+    const maxGameOverLoops = 50;
     let gameOverLoops = 0;
-    let timePassedNum = 1;
     // Game loop
     app.ticker.add((delta) => {
         if (gameRunning) {
@@ -103,21 +85,13 @@ function setup(app, viewport) {
         else {
             gameOverLoops += 1;
             if (gameOverLoops <= maxGameOverLoops) {
-                gameOver(app, timePassedNum);
+                gameOver(app);
             }
         }
     });
     setInterval(() => {
         if (gameRunning) {
             addEnemy(enemies, app, varus_container);
-            if (timePassed) {
-                app.stage.removeChild(timePassed);
-            }
-            timePassed = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Text"](`Seconds survived: ${timePassedNum}`, retrystyle);
-            timePassed.x = 50;
-            timePassed.y = 50;
-            app.stage.addChild(timePassed);
-            timePassedNum += 1;
         }
     }, 1000);
     app.renderer.plugins.interaction.on('mouseup', (event) => onClick(event, playerCurrentPos, player, playerTargetPos, app));
@@ -161,7 +135,7 @@ function createPlayer(app) {
     const container = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Container"]();
     app.stage.addChild(container);
     // Create a new texture
-    const texture = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Texture"].from('/assets/mink.png');
+    const texture = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Texture"].from('assets/mink.png');
     // Create mink
     const bunny = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](texture);
     bunny.anchor.set(0.5);
@@ -182,7 +156,7 @@ function createPlayer(app) {
 }
 function createEnemy(app, varus_container) {
     // Create a new texture
-    const textur = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Texture"].from('/assets/Covid.png');
+    const textur = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Texture"].from('assets/Covid.png');
     // Create mink
     const enemyx = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](textur);
     enemyx.anchor.set(0.5);
@@ -229,7 +203,7 @@ function collisiontest(enemy, player) {
         && bounds1.y < bounds2.y + 50 // + bounds2.height
         && bounds1.y + bounds1.height > bounds2.y;
 }
-function gameOver(app, timePassedNum) {
+function gameOver(app) {
     const end = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Graphics"]();
     end.beginFill(0x000000, 0.03);
     end.drawRect(0, 0, 1200, 800);
@@ -249,7 +223,7 @@ function gameOver(app, timePassedNum) {
         dropShadowAngle: Math.PI / 6,
         dropShadowDistance: 6,
         wordWrap: true,
-        wordWrapWidth: 800
+        wordWrapWidth: 700
     });
     var gameoverstyle = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["TextStyle"]({
         fontFamily: 'Arial',
@@ -303,20 +277,16 @@ function gameOver(app, timePassedNum) {
     gameovertext.x = 50;
     gameovertext.y = 50;
     app.stage.addChild(gameovertext);
-    var richText = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Text"]('17 million Minks in Denmark will be killed due to the coronavirus outbreak.', style);
+    var richText = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Text"]('17 million Minks in Denmark will be killed due to the virus outbreak.', style);
     richText.x = 50;
     richText.y = 200;
     var nicetxt = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Text"]('You let one die.', diestyle);
     nicetxt.x = 50;
     nicetxt.y = 350;
     app.stage.addChild(nicetxt);
-    const sruvivetext = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Text"](`This Mink survived ${timePassedNum} seconds.`, style);
-    sruvivetext.x = 50;
-    sruvivetext.y = 500;
-    app.stage.addChild(sruvivetext);
     var retrytext = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Text"]('Refresh your browser to save the next one.', retrystyle);
     retrytext.x = 50;
-    retrytext.y = 600;
+    retrytext.y = 500;
     app.stage.addChild(retrytext);
     app.stage.addChild(richText);
     return end;
