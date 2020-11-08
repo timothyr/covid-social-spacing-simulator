@@ -39,6 +39,8 @@ export function setup(app: PIXI.Application, viewport: Viewport) {
 
     setInterval(() => addEnemy(enemies, app, varus_container), 1000);
 
+    gameOver(app);
+
     app.renderer.plugins.interaction.on('mouseup', (event) => onClick(event, playerCurrentPos, player, playerTargetPos, app));
 }
 
@@ -178,9 +180,9 @@ function collisiontest(enemy, player) {
     const bounds1 = enemy.getBounds();
     const bounds2 = player.getBounds();
 
-    return bounds1.x < bounds2.x// + bounds2.width
+    return bounds1.x < bounds2.x + bounds2.width
         && bounds1.x + bounds1.width > bounds2.x
-        && bounds1.y < bounds2.y// + bounds2.height
+        && bounds1.y < bounds2.y + bounds2.height
         && bounds1.y + bounds1.height > bounds2.y;
 }
 
@@ -190,6 +192,100 @@ function gameOver(app) {
 	end.beginFill(0x3a4e3a);
 	end.drawRect(0, 0, 1200, 800);
 	end.endFill();
-	app.stage.addChild(end);
+    app.stage.addChild(end);
+    
+
+    
+    var style = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 36,
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        fill: ['#ffffff', '#00ff99'], // gradient
+        stroke: '#4a1850',
+        strokeThickness: 5,
+        dropShadow: true,
+        dropShadowColor: '#000000',
+        dropShadowBlur: 4,
+        dropShadowAngle: Math.PI / 6,
+        dropShadowDistance: 6,
+        wordWrap: true,
+        wordWrapWidth: 700
+    });
+
+    var gameoverstyle = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 72,
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        fill: ['#ffffff', '#ffff99'], // gradient
+        stroke: '#4a1850',
+        strokeThickness: 5,
+        dropShadow: true,
+        dropShadowColor: '#000000',
+        dropShadowBlur: 4,
+        dropShadowAngle: Math.PI / 6,
+        dropShadowDistance: 6,
+        wordWrap: true,
+        wordWrapWidth: 700
+    });
+    var diestyle = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 72,
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        fill: ['#ff0000', '#ff0000'], // gradient
+        stroke: '#4a1850',
+        strokeThickness: 5,
+        dropShadow: true,
+        dropShadowColor: '#000000',
+        dropShadowBlur: 4,
+        dropShadowAngle: Math.PI / 6,
+        dropShadowDistance: 6,
+        wordWrap: true,
+        wordWrapWidth: 700
+    });
+
+    var retrystyle = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 52,
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        fill: ['#00ffff', '#00ff00'], // gradient
+        stroke: '#4a1850',
+        strokeThickness: 10,
+        dropShadow: true,
+        dropShadowColor: '#000000',
+        dropShadowBlur: 4,
+        dropShadowAngle: Math.PI / 2,
+        dropShadowDistance: 6,
+        wordWrap: true,
+        wordWrapWidth: 700
+    });
+
+
+    const gameovertext = new PIXI.Text(`Game Over.`, gameoverstyle);
+    gameovertext.x = 50;
+    gameovertext.y = 50;
+    app.stage.addChild(gameovertext);
+    
+    var richText = new PIXI.Text('17 million Minks in Denmark will be killed due to the virus outbreak.', style);
+    richText.x = 50;
+    richText.y = 200;
+    
+    var nicetxt = new PIXI.Text('You let one die.', diestyle);
+    nicetxt.x = 50;
+    nicetxt.y = 350;
+
+    app.stage.addChild(nicetxt);
+
+    var retrytext = new PIXI.Text('Refresh your browser to save the next one.', retrystyle);
+    retrytext.x = 50;
+    retrytext.y = 500;
+    app.stage.addChild(retrytext);
+
+
+    app.stage.addChild(richText);
+
 	return end;
 }
