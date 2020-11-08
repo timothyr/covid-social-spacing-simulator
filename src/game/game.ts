@@ -4,11 +4,13 @@ import * as PIXI from 'pixi.js';
 export function setup(app: PIXI.Application, viewport: Viewport) {
 
 	const playerCurrentPos = {
+        rotation: 0,
 		x: app.screen.width / 2,
 		y: app.screen.height / 2
 	}
 
 	const playerTargetPos = {
+        rotation: 0,
 		x: app.screen.width / 2,
 		y: app.screen.height / 2
     }
@@ -20,7 +22,7 @@ export function setup(app: PIXI.Application, viewport: Viewport) {
         updatePlayerPos(player, playerCurrentPos, playerTargetPos, delta);
     });
 
-    app.renderer.plugins.interaction.on('mouseup', (event) => onClick(event, player, app, playerTargetPos));
+    app.renderer.plugins.interaction.on('mouseup', (event) => onClick(event, playerCurrentPos, app, playerTargetPos));
 }
 
 function updatePlayerPos(player, playerCurrentPos, playerTargetPos, delta) {
@@ -41,9 +43,13 @@ function updatePlayerPos(player, playerCurrentPos, playerTargetPos, delta) {
             playerCurrentPos.y = Math.round(playerCurrentPos.y);
         }
         player.position.x = playerCurrentPos.x;
-        console.log(playerCurrentPos.y, playerTargetPos.y)
+        // console.log(playerCurrentPos.y, playerTargetPos.y)
         player.position.y = playerCurrentPos.y;
     }
+
+    playerCurrentPos.rotation = lerp(playerCurrentPos.rotation, playerTargetPos.rotation, 0.1);
+    console.log("lerp", playerCurrentPos.rotation);
+    player.rotation = playerCurrentPos.rotation;
 }
 
 function createPlayer(app) {
@@ -52,7 +58,7 @@ function createPlayer(app) {
     app.stage.addChild(container);
     
     // Create a new texture
-    const texture = PIXI.Texture.from('/assets/mink.jpg');
+    const texture = PIXI.Texture.from('/assets/mink.png');
     
     // Create mink
     const bunny = new PIXI.Sprite(texture);
@@ -74,7 +80,20 @@ function createPlayer(app) {
     return container;
 }
 
-function onClick (event, container, app, target) {
+function onClick (event, player, app, target) {
 	target.x = Math.round(event.data.global.x);
     target.y = Math.round(event.data.global.y);
+    // Get target angle
+    const dy = target.y - player.y;
+    const dx = target.x - player.x;
+    const theta = Math.atan2(dy, dx);
+    target.rotation = theta + 2;//(theta * 180 / Math.PI) % 360;
+    console.log(player.rotation);
+}
+
+function lerp (value1, value2, amount) {
+    amount = amount < 0 ? 0 : amount;
+    amount = amount > 1 ? 1 : amount;
+    // const offset = a
+    return value1 + (value2 - value1) * amount;
 }
