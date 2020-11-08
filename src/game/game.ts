@@ -3,9 +3,13 @@ import * as PIXI from 'pixi.js';
 
 export function setup(app: PIXI.Application, viewport: Viewport) {
 
+    var landscapeTexture = PIXI.Texture.from('assets/bg.png');
+    
+    const background = new PIXI.Sprite(landscapeTexture);
+    app.stage.addChild(background)
+
     const varus_container = new PIXI.Container();
     app.stage.addChild(varus_container);
-
 
     const enemies = [];
 
